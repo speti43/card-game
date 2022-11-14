@@ -2,11 +2,13 @@ import { Component } from '@angular/core';
 import { CardData } from './models/card-data.model';
 import { RestartDialogComponent } from './restart-dialog/restart-dialog.component';
 import {MatDialog} from '@angular/material/dialog';
+import { CardStore } from './store/card-store';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
+  providers: [CardStore]
 })
 export class AppComponent {
   cardImages = [
@@ -22,7 +24,6 @@ export class AppComponent {
     'https://assets.4cdn.hu/kraken/7GyObHMUtl1oFUBcs.jpeg'
   ];
 
-  cards: CardData[] = [];
 
   flippedCards: CardData[] = [];
 
@@ -34,7 +35,7 @@ export class AppComponent {
       .map(a => a[1]);
   }
 
-  constructor(private dialog: MatDialog) {
+  constructor(private readonly dialog: MatDialog, public readonly cardStore: CardStore) {
 
   }
 
@@ -43,7 +44,7 @@ export class AppComponent {
   }
 
   setupCards(): void {
-    this.cards = [];
+    let cards : CardData[] = [];
     this.cardImages.forEach((image, index) => {
       const cardData: CardData = {
         imageId: index,
@@ -51,16 +52,17 @@ export class AppComponent {
         state: 'default'
       };
 
-      this.cards.push({ ...cardData });
-      this.cards.push({ ...cardData });
+      cards.push({ ...cardData });
+      cards.push({ ...cardData });
 
     });
 
-    this.cards = this.shuffleArray(this.cards);
+    cards = this.shuffleArray(cards);
+
+    this.cardStore.loadCard(cards);
   }
 
-  cardClicked(index: number): void {
-    const cardInfo = this.cards[index];
+  cardClicked(cardInfo:CardData): void {
 
     if (cardInfo.state === 'default' && this.flippedCards.length < 2) {
       cardInfo.state = 'flipped';

@@ -3,7 +3,7 @@
 </mat-toolbar>
 <div class="p-2">
   <div class="grid p-1">
-    <app-card *ngFor="let c of cards; let idx=index" [data]="c" (cardClicked)="cardClicked(idx)">
+    <app-card *ngFor="let c of this.cardStore.card$ | async" [data]="c" (cardClicked)="cardClicked(c)">
     </app-card>
   </div>
 </div>
